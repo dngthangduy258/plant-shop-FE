@@ -135,7 +135,7 @@ function Layout() {
         )}
 
         {/* Main Content */}
-        <main className={`flex-1 min-h-screen ${isPOS ? '' : 'lg:ml-64'} p-4`}>
+        <main className="flex-1 min-h-screen lg:ml-64 p-4">
           <Outlet />
         </main>
       </div>
