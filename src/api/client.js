@@ -5,17 +5,30 @@ const API_BASE = import.meta.env.VITE_API_URL || '/api';
 class ApiClient {
   constructor(baseUrl) {
     this.baseUrl = baseUrl;
+    this.sessionId = localStorage.getItem('session_id') || '';
+  }
+
+  setSession(sessionId) {
+    this.sessionId = sessionId;
+    if (sessionId) {
+      localStorage.setItem('session_id', sessionId);
+    } else {
+      localStorage.removeItem('session_id');
+    }
   }
 
   async request(endpoint, options = {}) {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(this.sessionId && { 'X-Session-ID': this.sessionId }),
+      ...options.headers,
+    };
+
     const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
       ...options,
+      headers,
     };
 
     try {
@@ -189,6 +202,38 @@ class ApiClient {
   // Health check
   async healthCheck() {
     return this.request('/health');
+  }
+
+  // Auth
+  async login(username, password) {
+    return this.request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    });
+  }
+
+  async register(username, password, store_name, phone) {
+    return this.request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ username, password, store_name, phone }),
+    });
+  }
+
+  async logout() {
+    return this.request('/auth/logout', { method: 'POST' });
+  }
+
+  async getCurrentUser() {
+    return this.request('/auth/me');
+  }
+
+  // Seed
+  async seedData() {
+    return this.request('/seed', { method: 'POST' });
+  }
+
+  async getSeedStatus() {
+    return this.request('/seed');
   }
 }
 

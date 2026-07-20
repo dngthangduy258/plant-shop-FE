@@ -12,7 +12,9 @@ import {
   Settings,
   Menu,
   X,
-  Leaf
+  Leaf,
+  LogOut,
+  User
 } from 'lucide-react';
 
 const navItems = [
@@ -27,11 +29,17 @@ const navItems = [
 ];
 
 function Layout() {
-  const { store } = useApp();
+  const { store, user, logout } = useApp();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const isPOS = location.pathname === '/pos';
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = '/login';
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -54,6 +62,31 @@ function Layout() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            {/* User Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-green-600 hover:bg-green-500 rounded-lg transition"
+              >
+                <User size={18} />
+                <span className="text-sm font-medium hidden sm:block">{user?.username || 'User'}</span>
+              </button>
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-1">
+                  <div className="px-4 py-2 border-b">
+                    <p className="font-medium text-gray-800">{user?.username}</p>
+                    <p className="text-xs text-gray-500">{user?.store_name}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 transition"
+                  >
+                    <LogOut size={16} />
+                    Đăng xuất
+                  </button>
+                </div>
+              )}
+            </div>
             <span className="text-sm hidden sm:block">
               {new Date().toLocaleDateString('vi-VN', {
                 weekday: 'long',
