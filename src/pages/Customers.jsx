@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 function Customers() {
-  const { api } = useApp();
+  const { api, showToast } = useApp();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -103,20 +103,30 @@ function Customers() {
     try {
       if (editingCustomer) {
         await api.updateCustomer(editingCustomer.id, customerForm);
+        showToast('Cập nhật khách hàng thành công!', 'success');
       } else {
         await api.createCustomer(customerForm);
+        showToast('Thêm khách hàng mới thành công!', 'success');
       }
       setShowModal(false);
       fetchCustomers();
     } catch (error) {
       console.error('Error saving customer:', error);
+      const errorMsg = error.response?.data?.error || error.message || 'Không thể lưu khách hàng';
+      showToast('Có lỗi xảy ra: ' + errorMsg, 'error');
     }
   };
 
   const handleViewDetail = async (customer) => {
-    const detail = await api.getCustomer(customer.id);
-    setSelectedCustomer(detail);
-    setShowDetailModal(true);
+    try {
+      const detail = await api.getCustomer(customer.id);
+      const debtsRes = await api.getCustomerDebts(customer.id);
+      setSelectedCustomer({ ...detail, customer_debts: debtsRes.data || [] });
+      setShowDetailModal(true);
+    } catch (error) {
+      console.error('Error fetching customer detail:', error);
+      showToast('Không thể tải thông tin khách hàng', 'error');
+    }
   };
 
   return (
@@ -355,6 +365,37 @@ function Customers() {
                     </div>
                   ))}
                 </div>
+              ) : (
+                <p className="text-gray-500 text-sm">Chưa có lịch sử mua hàng</p>
+              )}
+
+              {/* Customer Debts */}
+              {selectedCustomer.customer_debts?.length > 0 && (
+                <>
+                  <h4 className="font-semibold text-gray-800 mb-3 mt-4">Chi tiết công nợ</h4>
+                  <div className="space-y-2">
+                    {selectedCustomer.customer_debts.map(debt => (
+                      <div key={debt.id} className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium text-orange-700">
+                              {debt.invoice_number || `Nợ #${debt.id.slice(-6)}`}
+                            </p>
+                            <p className="text-sm text-gray-500">{formatDate(debt.created_at)}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">Tổng: {formatCurrency(debt.amount)}</p>
+                            <p className="text-sm text-green-600">Đã trả: {formatCurrency(debt.paid_amount)}</p>
+                            <p className="text-sm font-medium text-orange-600">
+                              Còn nợ: {formatCurrency(debt.remaining_amount)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
               ) : (
                 <p className="text-gray-500 text-center py-4">Chưa có lịch sử mua hàng</p>
               )}

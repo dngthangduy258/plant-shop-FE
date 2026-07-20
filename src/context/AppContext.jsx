@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api } from '../api/client';
+import { CheckCircle, XCircle, Loader, AlertCircle, X } from 'lucide-react';
 
 const AppContext = createContext();
 
@@ -12,6 +13,16 @@ export function AppProvider({ children }) {
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const showToast = useCallback((message, type = 'info', duration = 3000) => {
+    setToast({ message, type, id: Date.now() });
+    if (duration > 0) {
+      setTimeout(() => setToast(null), duration);
+    }
+  }, []);
+
+  const hideToast = useCallback(() => setToast(null), []);
 
   const fetchInitialData = useCallback(async () => {
     try {
@@ -135,12 +146,36 @@ export function AppProvider({ children }) {
     login,
     register,
     logout,
-    seedData
+    seedData,
+    toast,
+    showToast,
+    hideToast
   };
 
   return (
     <AppContext.Provider value={value}>
       {children}
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed top-4 right-4 z-[9999] animate-slide-in">
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg border ${
+            toast.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' :
+            toast.type === 'error' ? 'bg-red-50 border-red-200 text-red-800' :
+            toast.type === 'warning' ? 'bg-yellow-50 border-yellow-200 text-yellow-800' :
+            'bg-blue-50 border-blue-200 text-blue-800'
+          }`}>
+            {toast.type === 'success' && <CheckCircle className="w-5 h-5 text-green-600" />}
+            {toast.type === 'error' && <XCircle className="w-5 h-5 text-red-600" />}
+            {toast.type === 'warning' && <AlertCircle className="w-5 h-5 text-yellow-600" />}
+            {toast.type === 'loading' && <Loader className="w-5 h-5 text-blue-600 animate-spin" />}
+            {toast.type === 'info' && <AlertCircle className="w-5 h-5 text-blue-600" />}
+            <span className="font-medium">{toast.message}</span>
+            <button onClick={hideToast} className="ml-2 hover:opacity-70">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </AppContext.Provider>
   );
 }

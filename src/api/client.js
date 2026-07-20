@@ -36,7 +36,9 @@ class ApiClient {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.error || 'Request failed');
+        const error = new Error(data.error || 'Request failed');
+        error.response = { status: response.status, data };
+        throw error;
       }
       
       return data;
@@ -134,6 +136,11 @@ class ApiClient {
 
   async getDebtSummary() {
     return this.request('/debts/summary');
+  }
+
+  async getCustomerDebts(customerId, status = '') {
+    const query = status ? `?status=${status}` : '';
+    return this.request(`/debts/customer/${customerId}${query}`);
   }
 
   async payDebt(id, data) {

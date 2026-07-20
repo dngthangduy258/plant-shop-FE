@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 function POS() {
-  const { api, categories, products: allProducts, customers } = useApp();
+  const { api, categories, products: allProducts, customers, showToast, refreshData } = useApp();
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -137,11 +137,18 @@ function POS() {
 
   const handleCreateCustomer = async () => {
     if (!newCustomer.name) return;
-    const customer = await api.createCustomer(newCustomer);
-    setCustomerList([...customerList, customer]);
-    setSelectedCustomer(customer);
-    setShowCustomerModal(false);
-    setNewCustomer({ name: '', phone: '', address: '' });
+    try {
+      const customer = await api.createCustomer(newCustomer);
+      setCustomerList([...customerList, customer.data || customer]);
+      setSelectedCustomer(customer.data || customer);
+      setShowCustomerModal(false);
+      setNewCustomer({ name: '', phone: '', address: '' });
+      showToast('Thêm khách hàng mới thành công!', 'success');
+    } catch (error) {
+      console.error('Error creating customer:', error);
+      const errorMsg = error.response?.data?.error || error.message || 'Không thể tạo khách hàng';
+      showToast('Có lỗi xảy ra: ' + errorMsg, 'error');
+    }
   };
 
   const handlePayment = async () => {
@@ -149,22 +156,29 @@ function POS() {
 
     setPaymentInfo({ ...paymentInfo, paid_amount: total });
 
-    const invoice = await api.createInvoice({
-      customer_id: selectedCustomer?.id,
-      customer_name: selectedCustomer?.name || 'Khách lẻ',
-      customer_phone: selectedCustomer?.phone,
-      customer_address: selectedCustomer?.address,
-      items: cart,
-      discount_amount: 0,
-      payment_method: paymentInfo.method,
-      paid_amount: paymentInfo.paid_amount,
-      note: paymentInfo.note
-    });
+    try {
+      const invoice = await api.createInvoice({
+        customer_id: selectedCustomer?.id,
+        customer_name: selectedCustomer?.name || 'Khách lẻ',
+        customer_phone: selectedCustomer?.phone,
+        customer_address: selectedCustomer?.address,
+        items: cart,
+        discount_amount: 0,
+        payment_method: paymentInfo.method,
+        paid_amount: paymentInfo.paid_amount,
+        note: paymentInfo.note
+      });
 
-    setCreatedInvoice(invoice);
-    setShowPaymentModal(false);
-    setShowInvoiceModal(true);
-    fetchProducts(); // Refresh stock
+      setCreatedInvoice(invoice);
+      setShowPaymentModal(false);
+      setShowInvoiceModal(true);
+      showToast('Tạo hóa đơn thành công!', 'success');
+      fetchProducts(); // Refresh stock
+      refreshData(); // Refresh all data
+    } catch (error) {
+      console.error('Error creating invoice:', error);
+      showToast('Có lỗi xảy ra: ' + (error.message || 'Không thể tạo hóa đơn'), 'error');
+    }
   };
 
   const handleNewSale = () => {

@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 function Products() {
-  const { api, categories } = useApp();
+  const { api, categories, showToast } = useApp();
   const [searchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -108,13 +108,16 @@ function Products() {
     try {
       if (editingProduct) {
         await api.updateProduct(editingProduct.id, productForm);
+        showToast('Cập nhật sản phẩm thành công!', 'success');
       } else {
         await api.createProduct(productForm);
+        showToast('Thêm sản phẩm mới thành công!', 'success');
       }
       setShowModal(false);
       fetchProducts();
     } catch (error) {
       console.error('Error saving product:', error);
+      showToast('Có lỗi xảy ra: ' + (error.message || 'Không thể lưu sản phẩm'), 'error');
     }
   };
 
@@ -122,9 +125,11 @@ function Products() {
     if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
     try {
       await api.deleteProduct(id);
+      showToast('Xóa sản phẩm thành công!', 'success');
       fetchProducts();
     } catch (error) {
       console.error('Error deleting product:', error);
+      showToast('Có lỗi xảy ra: ' + (error.message || 'Không thể xóa sản phẩm'), 'error');
     }
   };
 
@@ -145,6 +150,7 @@ function Products() {
   const handleSaveBatch = async () => {
     try {
       await api.addBatch(selectedProduct.id, batchForm);
+      showToast('Thêm lô hàng thành công!', 'success');
       const productBatches = await api.getProductBatches(selectedProduct.id);
       setBatches(productBatches);
       fetchProducts();
@@ -157,6 +163,7 @@ function Products() {
       });
     } catch (error) {
       console.error('Error saving batch:', error);
+      showToast('Có lỗi xảy ra: ' + (error.message || 'Không thể thêm lô hàng'), 'error');
     }
   };
 

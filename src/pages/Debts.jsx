@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 function Debts() {
-  const { api } = useApp();
+  const { api, showToast } = useApp();
   const [debts, setDebts] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,11 +72,13 @@ function Debts() {
         amount: payAmount,
         payment_method: paymentMethod
       });
+      showToast('Thu tiền công nợ thành công!', 'success');
       setShowPayModal(false);
       fetchDebts();
       fetchSummary();
     } catch (error) {
       console.error('Error paying debt:', error);
+      showToast('Có lỗi xảy ra: ' + (error.message || 'Không thể thu tiền'), 'error');
     }
   };
 

@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 function Settings() {
-  const { api, store, categories, setCategories } = useApp();
+  const { api, store, categories, setCategories, showToast } = useApp();
   const [storeInfo, setStoreInfo] = useState({
     name: '',
     address: '',
@@ -35,10 +35,10 @@ function Settings() {
   const handleSaveStore = async () => {
     try {
       await api.updateStore(storeInfo);
-      alert('Lưu thông tin cửa hàng thành công!');
+      showToast('Lưu thông tin cửa hàng thành công!', 'success');
     } catch (error) {
       console.error('Error saving store:', error);
-      alert('Lỗi khi lưu thông tin!');
+      showToast('Có lỗi xảy ra: ' + (error.message || 'Không thể lưu thông tin'), 'error');
     }
   };
 
@@ -47,10 +47,12 @@ function Settings() {
     try {
       const result = await api.createCategory({ name: newCategory });
       setCategories([...categories, result.data]);
+      showToast('Thêm danh mục thành công!', 'success');
       setNewCategory('');
       setShowCategoryModal(false);
     } catch (error) {
       console.error('Error adding category:', error);
+      showToast('Có lỗi xảy ra: ' + (error.message || 'Không thể thêm danh mục'), 'error');
     }
   };
 
