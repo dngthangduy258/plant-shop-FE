@@ -59,16 +59,16 @@ function Reports() {
 
       switch (activeTab) {
         case 'sales':
-          const sales = await api.getSalesReport(params);
-          setSalesData(sales);
+          const salesResp = await api.getSalesReport(params);
+          setSalesData(salesResp.data || []);
           break;
         case 'tax':
-          const tax = await api.getTaxReport(params);
-          setTaxData(tax);
+          const taxResp = await api.getTaxReport(params);
+          setTaxData(taxResp.data || []);
           break;
         case 'products':
-          const products = await api.getProductReport(params);
-          setProductData(products);
+          const productsResp = await api.getProductReport(params);
+          setProductData(productsResp.data || []);
           break;
       }
     } catch (error) {
