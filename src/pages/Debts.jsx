@@ -29,8 +29,8 @@ function Debts() {
 
   const fetchDebts = async () => {
     try {
-      const data = await api.getDebts(filter === 'all' ? '' : filter);
-      setDebts(data);
+      const response = await api.getDebts(filter === 'all' ? '' : filter);
+      setDebts(response.data || []);
     } catch (error) {
       console.error('Error fetching debts:', error);
     } finally {
@@ -40,8 +40,8 @@ function Debts() {
 
   const fetchSummary = async () => {
     try {
-      const data = await api.getDebtSummary();
-      setSummary(data);
+      const response = await api.getDebtSummary();
+      setSummary(response);
     } catch (error) {
       console.error('Error fetching summary:', error);
     }

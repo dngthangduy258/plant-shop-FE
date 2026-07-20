@@ -55,8 +55,8 @@ function Products() {
       if (searchQuery) params.search = searchQuery;
       if (selectedCategory) params.category_id = selectedCategory;
       if (isLowStock) params.low_stock = 'true';
-      const data = await api.getProducts(params);
-      setProducts(data);
+      const response = await api.getProducts(params);
+      setProducts(response.data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {

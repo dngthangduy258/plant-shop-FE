@@ -38,10 +38,11 @@ function Customers() {
 
   const fetchCustomers = async () => {
     try {
-      const data = await api.getCustomers(searchQuery);
+      const response = await api.getCustomers(searchQuery);
+      const customersList = response.data || [];
       // Get debt info for each customer
       const customersWithDebt = await Promise.all(
-        data.map(async (customer) => {
+        customersList.map(async (customer) => {
           const detail = await api.getCustomer(customer.id);
           return { ...customer, total_debt: detail.total_debt };
         })

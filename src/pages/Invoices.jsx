@@ -32,8 +32,8 @@ function Invoices() {
       const params = {};
       if (dateRange.start_date) params.start_date = dateRange.start_date;
       if (dateRange.end_date) params.end_date = dateRange.end_date;
-      const data = await api.getInvoices(params);
-      setInvoices(data);
+      const response = await api.getInvoices(params);
+      setInvoices(response.data || []);
     } catch (error) {
       console.error('Error fetching invoices:', error);
     } finally {

@@ -42,13 +42,13 @@ function POS() {
   }, []);
 
   const fetchProducts = async () => {
-    const data = await api.getProducts();
-    setProducts(data);
+    const response = await api.getProducts();
+    setProducts(response.data || []);
   };
 
   const fetchCustomers = async () => {
-    const data = await api.getCustomers();
-    setCustomerList(data);
+    const response = await api.getCustomers();
+    setCustomerList(response.data || []);
   };
 
   const formatCurrency = (amount) => {
