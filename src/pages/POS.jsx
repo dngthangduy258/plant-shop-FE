@@ -60,8 +60,8 @@ function POS() {
   };
 
   const filteredProducts = products.filter(p => {
-    const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                       p.code.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchSearch = (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                       (p.code || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchCategory = !selectedCategory || p.category_id === selectedCategory;
     return matchSearch && matchCategory;
   });
@@ -179,8 +179,8 @@ function POS() {
   };
 
   const filteredCustomers = customerList.filter(c =>
-    c.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
-    c.phone?.includes(customerSearch)
+    (c.name || '').toLowerCase().includes(customerSearch.toLowerCase()) ||
+    (c.phone || '').includes(customerSearch)
   );
 
   return (
