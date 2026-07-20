@@ -245,7 +245,7 @@ function POS() {
           {/* Products */}
           <div className="flex-1 overflow-y-auto p-4">
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-5 gap-2">
                 {filteredProducts.map(product => {
                   const stock = product.total_stock || 0;
                   const isLowStock = stock <= 10;
@@ -256,27 +256,27 @@ function POS() {
                       key={product.id}
                       onClick={() => !isOutOfStock && addToCart(product)}
                       disabled={isOutOfStock}
-                      className={`text-left p-3 rounded-lg border transition-all ${
+                      className={`text-left p-2 rounded-lg border transition-all ${
                         isOutOfStock
                           ? 'bg-gray-100 border-gray-200 opacity-50 cursor-not-allowed'
                           : 'bg-white border-gray-200 hover:border-green-500 hover:shadow-md'
                       }`}
                     >
-                      <div className="aspect-square bg-gray-100 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
+                      <div className="aspect-square bg-gray-100 rounded-lg mb-2 flex items-center justify-center overflow-hidden text-3xl">
                         {product.image_url ? (
                           <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                         ) : (
-                          <span className="text-3xl">📦</span>
+                          <span>📦</span>
                         )}
                       </div>
-                      <p className="font-medium text-gray-800 text-sm line-clamp-2">{product.name}</p>
-                      <p className="text-xs text-gray-500">{product.code}</p>
-                      <div className="mt-2 flex items-center justify-between">
-                        <span className="font-semibold text-green-600">
+                      <p className="font-medium text-gray-800 text-xs line-clamp-2 truncate">{product.name}</p>
+                      <p className="text-xs text-gray-500 truncate">{product.code}</p>
+                      <div className="mt-1 flex items-center justify-between text-xs">
+                        <span className="font-semibold text-green-600 text-xs">
                           {formatCurrency(product.selling_price)}
                         </span>
-                        <span className={`text-xs ${isOutOfStock ? 'text-red-500' : isLowStock ? 'text-orange-500' : 'text-gray-500'}`}>
-                          {isOutOfStock ? 'Hết hàng' : `Còn ${stock}`}
+                        <span className={`${isOutOfStock ? 'text-red-500' : isLowStock ? 'text-orange-500' : 'text-gray-500'}`}>
+                          {isOutOfStock ? 'Hết' : `${stock}`}
                         </span>
                       </div>
                     </button>
